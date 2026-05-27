@@ -4,6 +4,7 @@
     linear-gradient(90deg, rgb(0 0 0 / 0.03) 1px, transparent 1px),
     #f2f2f2;
   background-size: 28px 28px;
+  padding-top: 0;
 }
 
 .classified-dossier:not(.declassified-mode) {
@@ -19,16 +20,18 @@
 .folder-shell {
   display: flex;
   flex-direction: column;
-  padding-top: 3.75rem;
+  padding-top: 0;
+  position: relative;
 }
 
 .folder-header {
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
   gap: 1rem;
   justify-content: space-between;
+  margin-bottom: clamp(1rem, 2vw, 1.75rem);
   position: relative;
-  z-index: 3;
+  z-index: 12;
 }
 
 .folder-actions {
@@ -38,17 +41,30 @@
   flex-wrap: wrap;
   gap: 0.6rem;
   justify-content: flex-end;
-  margin-bottom: 0.5rem;
+  margin-top: 0.35rem;
 }
 
 .folder-tabs {
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding-left: clamp(0.5rem, 2vw, 2rem);
+  flex-wrap: nowrap;
+  gap: 0.2rem;
+  overflow-x: auto;
+  padding: 0 clamp(0.25rem, 1vw, 0.75rem) 0.55rem 0;
   position: relative;
-  z-index: 3;
+  scrollbar-width: thin;
+  z-index: 13;
+}
+
+.folder-tabs::before {
+  background: #000000;
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
 }
 
 .download-pdf-button,
@@ -100,20 +116,22 @@
 .folder-tab {
   background: #b6b09f;
   border: 2px solid #000000;
-  border-bottom: 0;
+  border-top: 0;
   color: #000000;
   cursor: pointer;
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 88% 100%, 0 100%);
+  flex: 0 0 auto;
   font: inherit;
-  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+  font-size: clamp(0.74rem, 1.1vw, 0.9rem);
   font-weight: 700;
-  letter-spacing: 0.14em;
-  min-height: 3.25rem;
-  min-width: clamp(8.25rem, 17vw, 12rem);
-  padding: 0.75rem 1rem 0.65rem;
+  letter-spacing: 0.12em;
+  min-height: 3.15rem;
+  min-width: clamp(7.35rem, 14vw, 10.5rem);
+  padding: 0.62rem 1.15rem 0.58rem 0.8rem;
   position: relative;
   text-align: left;
   text-transform: uppercase;
-  transform: translateY(2px);
+  transform: translateY(-0.15rem);
   transition:
     background-color 180ms ease,
     color 180ms ease,
@@ -122,15 +140,12 @@
 }
 
 .folder-tab::after {
-  background: rgb(0 0 0 / 0.16);
-  bottom: 0;
+  background:
+    linear-gradient(90deg, transparent, rgb(0 0 0 / 0.2));
   content: "";
-  height: 100%;
+  inset: 0 0 0 auto;
   position: absolute;
-  right: -0.55rem;
-  top: 0.45rem;
-  transform: skewY(34deg);
-  width: 0.55rem;
+  width: 1rem;
 }
 
 .folder-tab span {
@@ -143,7 +158,7 @@
 .folder-tab:hover,
 .folder-tab.is-active {
   background: #f2f2f2;
-  min-height: 3.75rem;
+  min-height: 3.8rem;
   transform: translateY(0);
 }
 
@@ -153,31 +168,126 @@
 
 .classified-dossier:not(.declassified-mode) .folder-tab {
   border-color: #b6b09f;
-  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.26);
+  box-shadow: 4px 7px 0 rgb(0 0 0 / 0.26);
 }
 
 .classified-dossier:not(.declassified-mode) .folder-tab:nth-child(odd) {
-  transform: rotate(-1.4deg) translateY(2px);
+  transform: rotate(-1.2deg) translateY(-0.1rem);
 }
 
 .classified-dossier:not(.declassified-mode) .folder-tab:nth-child(even) {
-  transform: rotate(1.1deg) translateY(3px);
+  transform: rotate(0.9deg) translateY(-0.05rem);
 }
 
 .classified-dossier:not(.declassified-mode) .folder-tab.is-active {
-  transform: rotate(-0.4deg) translateY(0);
+  transform: rotate(-0.35deg) translateY(0);
 }
 
 .folder-panel {
-  background: #f2f2f2;
-  border: 2px solid #000000;
-  box-shadow: 16px 16px 0 rgb(0 0 0 / 0.14);
-  min-height: calc(100vh - 9rem);
+  display: grid;
+  justify-items: center;
+  min-height: calc(100vh - 8.5rem);
+  padding: 1.75rem 0.35rem 3rem;
   position: relative;
-  z-index: 2;
+  z-index: 4;
 }
 
 .classified-dossier:not(.declassified-mode) .folder-panel {
+  transform: rotate(-0.2deg);
+}
+
+.folder-panel::before {
+  background:
+    linear-gradient(106deg, transparent 0 72%, rgb(0 0 0 / 0.08) 72% 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 0.028) 0,
+      rgb(0 0 0 / 0.028) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    #e7e2d2;
+  border: 2px solid rgb(0 0 0 / 0.56);
+  box-shadow: 12px 14px 0 rgb(0 0 0 / 0.12);
+  content: "";
+  height: min(68rem, calc(100% - 3rem));
+  left: 50%;
+  max-height: 76rem;
+  top: 1.15rem;
+  width: min(47rem, calc(100% - 2rem));
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-48%) rotate(3.2deg) translateY(0.45rem);
+  z-index: 0;
+}
+
+.folder-panel::after {
+  background:
+    linear-gradient(96deg, transparent 0 84%, rgb(0 0 0 / 0.1) 84% 100%),
+    #f7f5ed;
+  border: 1px solid rgb(0 0 0 / 0.48);
+  box-shadow: 10px 12px 0 rgb(0 0 0 / 0.1);
+  content: "";
+  height: min(62rem, calc(100% - 8rem));
+  left: 50%;
+  top: 5.25rem;
+  width: min(44rem, calc(100% - 2.4rem));
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-54%) rotate(-5deg);
+  z-index: 0;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-panel::before {
+  background:
+    linear-gradient(105deg, transparent 0 78%, rgb(0 0 0 / 0.2) 78% 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 0.045) 0,
+      rgb(0 0 0 / 0.045) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    #b6b09f;
+  border-color: rgb(182 176 159 / 0.74);
+  box-shadow: 16px 17px 0 rgb(0 0 0 / 0.34);
+  opacity: 0.86;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-panel::after {
+  background:
+    linear-gradient(92deg, transparent 0 86%, rgb(0 0 0 / 0.14) 86% 100%),
+    #f2f2f2;
+  border-color: rgb(0 0 0 / 0.62);
+  box-shadow: 11px 12px 0 rgb(0 0 0 / 0.26);
+  opacity: 0.84;
+}
+
+.folder-file {
+  background:
+    repeating-linear-gradient(
+      -1.5deg,
+      rgb(0 0 0 / 0.024) 0,
+      rgb(0 0 0 / 0.024) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    #f2f2f2;
+  border: 2px solid #000000;
+  box-shadow:
+    16px 18px 0 rgb(0 0 0 / 0.18),
+    0 0 0 1px rgb(255 255 255 / 0.42) inset;
+  max-width: 48rem;
+  min-height: 66rem;
+  overflow: hidden;
+  padding: clamp(2rem, 4vw, 4rem);
+  position: relative;
+  transform: rotate(-0.45deg);
+  width: min(100%, 48rem);
+  z-index: 2;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-file {
   background:
     repeating-linear-gradient(
       -4deg,
@@ -188,67 +298,132 @@
     ),
     #101010;
   border-color: #b6b09f;
-  box-shadow: 18px 18px 0 rgb(0 0 0 / 0.42);
-  transform: rotate(-0.35deg);
+  box-shadow:
+    18px 20px 0 rgb(0 0 0 / 0.42),
+    0 0 0 1px rgb(242 242 242 / 0.08) inset;
+  color: #f2f2f2;
 }
 
-.folder-panel::before {
-  border: 1px solid rgb(0 0 0 / 0.18);
+#file-formacion {
+  transform: rotate(0.35deg);
+}
+
+#file-experiencia {
+  transform: rotate(-0.75deg);
+}
+
+#file-intel {
+  transform: rotate(0.55deg);
+}
+
+.profile-document-stack {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 66rem;
+  position: relative;
+  width: min(100%, 66rem);
+  z-index: 3;
+}
+
+.profile-document-stack .is-profile {
+  min-height: 58rem;
+  padding: 3.35rem 3.5rem;
+  width: min(100%, 47rem);
+}
+
+.profile-photo-sheet {
+  background: #0a0a0a;
+  border: 2px solid #000000;
+  box-shadow: 12px 15px 0 rgb(0 0 0 / 0.18);
+  height: min(43rem, calc(100% - 8rem));
+  left: 0.35rem;
+  overflow: hidden;
+  position: absolute;
+  top: 5.3rem;
+  transform: rotate(-8deg);
+  width: min(23rem, 38%);
+  z-index: 1;
+}
+
+.profile-photo-sheet::after {
+  border: 1px solid rgb(242 242 242 / 0.5);
   content: "";
   inset: 1rem;
   pointer-events: none;
   position: absolute;
+  z-index: 3;
+}
+
+.profile-photo-tag {
+  background: #000000;
+  border: 1px solid rgb(182 176 159 / 0.62);
+  color: #b6b09f;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 0.5rem 0.75rem;
+  position: absolute;
+  right: 1.45rem;
+  text-transform: uppercase;
+  top: 1.45rem;
   z-index: 4;
 }
 
-.classified-dossier:not(.declassified-mode) .folder-panel::before {
-  background:
-    linear-gradient(105deg, transparent 0 78%, rgb(0 0 0 / 0.18) 78% 100%),
-    repeating-linear-gradient(
-      0deg,
-      rgb(0 0 0 / 0.045) 0,
-      rgb(0 0 0 / 0.045) 1px,
-      transparent 1px,
-      transparent 10px
-    ),
-    #b6b09f;
-  border: 2px solid rgb(0 0 0 / 0.72);
-  box-shadow: 14px 14px 0 rgb(0 0 0 / 0.24);
-  content: "";
-  inset: -1.8rem 8% auto auto;
-  min-height: 11rem;
-  opacity: 0.82;
-  position: absolute;
-  transform: rotate(4deg);
-  width: min(38rem, 58vw);
-  z-index: 0;
+.is-profile .case-file {
+  background: rgb(242 242 242 / 0.46);
+  min-height: 100%;
+  padding: 0.35rem;
 }
 
-.classified-dossier:not(.declassified-mode) .folder-panel::after {
-  background:
-    linear-gradient(92deg, transparent 0 86%, rgb(0 0 0 / 0.14) 86% 100%),
-    #f2f2f2;
-  border: 1px solid rgb(0 0 0 / 0.54);
-  box-shadow: 10px 10px 0 rgb(0 0 0 / 0.2);
-  content: "";
-  height: min(18rem, 32vh);
-  left: -1.35rem;
-  position: absolute;
-  top: 5.4rem;
-  transform: rotate(-6deg);
-  width: min(26rem, 42vw);
-  z-index: 0;
+.is-profile .case-title {
+  font-size: clamp(3.35rem, 5.4vw, 4rem);
+  line-height: 0.96;
 }
 
-.folder-file {
-  min-height: calc(100vh - 9.25rem);
-  padding: clamp(2rem, 4vw, 4rem);
-  position: relative;
-  z-index: 1;
+.profile-contact-sheet {
+  border-bottom: 2px solid #000000;
+  border-top: 2px solid #000000;
+  margin-top: 2.5rem;
+  padding: 1.35rem 0;
 }
 
-.classified-dossier:not(.declassified-mode) .folder-file {
-  color: #f2f2f2;
+.profile-contact-sheet .classified-heading h2 {
+  font-size: 1.65rem;
+}
+
+.profile-contact-sheet .contact-item {
+  border-left-color: #000000;
+  padding-bottom: 0.55rem;
+  padding-top: 0.55rem;
+}
+
+.profile-contact-sheet .contact-item span:first-child {
+  color: rgb(0 0 0 / 0.62);
+}
+
+.profile-contact-sheet .contact-item span:last-child {
+  color: #000000;
+}
+
+.classified-dossier:not(.declassified-mode) .profile-photo-sheet {
+  border-color: #b6b09f;
+  box-shadow: 15px 17px 0 rgb(0 0 0 / 0.36);
+}
+
+.classified-dossier:not(.declassified-mode) .is-profile .case-file {
+  background: rgb(0 0 0 / 0.22);
+}
+
+.classified-dossier:not(.declassified-mode) .profile-contact-sheet {
+  border-color: #b6b09f;
+}
+
+.classified-dossier:not(.declassified-mode) .profile-contact-sheet .contact-item {
+  border-left-color: #b6b09f;
+}
+
+.classified-dossier:not(.declassified-mode) .profile-contact-sheet .contact-item span:first-child {
+  color: rgb(182 176 159 / 0.88);
 }
 
 .classified-dossier:not(.declassified-mode) .folder-file::before {
@@ -293,6 +468,10 @@
   z-index: 1;
 }
 
+.folder-file > .grid {
+  grid-template-columns: 1fr !important;
+}
+
 .folder-file--intel {
   background:
     linear-gradient(rgb(242 242 242 / 0.035) 1px, transparent 1px),
@@ -300,6 +479,7 @@
     #000000;
   background-size: 26px 26px;
   color: #f2f2f2;
+  grid-template-columns: 1fr !important;
 }
 
 .folder-file--intel::after {
@@ -818,16 +998,8 @@
 }
 
 .declassified-mode .folder-panel {
-  background:
-    repeating-linear-gradient(
-      -2deg,
-      rgb(0 0 0 / 0.025) 0,
-      rgb(0 0 0 / 0.025) 1px,
-      transparent 1px,
-      transparent 9px
-    ),
-    #f2f2f2;
-  box-shadow: 18px 18px 0 rgb(0 0 0 / 0.24);
+  background: transparent;
+  box-shadow: none;
 }
 
 .declassified-mode .folder-file::after {
@@ -1053,6 +1225,5 @@ html.chameleon-view-transition::view-transition-old(root) {
   .folder-actions {
     justify-content: flex-start;
     margin-bottom: 0;
-    order: -1;
   }
 }

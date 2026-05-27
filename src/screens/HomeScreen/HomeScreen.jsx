@@ -81,12 +81,6 @@ const languages = [
 
 const interests = ['Videojuegos', 'Musica', 'Lectura']
 
-const caseFacts = [
-  { label: 'Expediente', value: 'JAYG-1996' },
-  { label: 'Operacion', value: 'Administracion + Software' },
-  { label: 'Estado', value: 'Activo desde ene 2023' },
-]
-
 const profile = {
   headline: 'Desarrollador de software',
   name: 'James Antonio Yang Gramajo',
@@ -335,53 +329,43 @@ function HomeScreen() {
 
           <div className="folder-panel">
             {activeFile === 'perfil' ? (
-              <section className="folder-file is-profile grid gap-8 lg:grid-cols-[60%_40%]" id="file-perfil">
-                <div className="case-file flex flex-col justify-between gap-12">
-                  <div className="max-w-4xl">
-                    <div className="classified-stamp mb-6 w-fit px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">
-                      {isDeclassified ? 'Expediente desclasificado' : 'Archivo clasificado'}
-                    </div>
-                    <p className="mb-4 text-sm uppercase tracking-[0.28em] text-black/55">
-                      Portafolio CV / Expediente profesional
-                    </p>
-                    <h1 className="case-title text-5xl font-semibold leading-[0.95] text-black sm:text-7xl lg:text-8xl">
-                      James <RedactedText width="7ch">Antonio</RedactedText> Yang Gramajo
-                    </h1>
-                    <p className="case-summary mt-8 max-w-2xl text-xl leading-relaxed text-black/70">
-                      {profile.headline}. Operacion registrada en{' '}
-                      <RedactedText width="11ch">Huehuetenango</RedactedText>.
-                    </p>
-                  </div>
-
-                  <div className="case-facts grid gap-3 sm:grid-cols-3">
-                    {caseFacts.map((fact) => (
-                      <div className="case-fact" key={fact.label}>
-                        <p>{fact.label}</p>
-                        <strong>{fact.value}</strong>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <aside className="profile-dossier relative flex min-h-[560px] flex-col justify-between overflow-hidden px-6 py-8 text-[#F2F2F2] sm:px-10 lg:px-12 lg:py-12">
+              <div className="profile-document-stack">
+                <aside className="profile-photo-sheet" aria-label="Fotografia de expediente">
                   <div className="evidence-photo">
                     <img alt="James Antonio Yang Gramajo" src={profileImage} />
                   </div>
+                  <div className="profile-photo-tag">Huehuetenango</div>
+                </aside>
 
-                  <div className="relative z-10 ml-auto w-fit border border-[#B6B09F]/50 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#B6B09F]">
-                    Huehuetenango
-                  </div>
+                <section className="folder-file is-profile" id="file-perfil">
+                  <div className="case-file flex min-h-full flex-col justify-between gap-10">
+                    <div>
+                      <div className="classified-stamp mb-6 w-fit px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">
+                        {isDeclassified ? 'Expediente desclasificado' : 'Archivo clasificado'}
+                      </div>
+                      <p className="mb-4 text-sm uppercase tracking-[0.28em] text-black/55">
+                        Portafolio CV / Expediente profesional
+                      </p>
+                      <h1 className="case-title text-5xl font-semibold leading-[0.95] text-black sm:text-7xl lg:text-8xl">
+                        James <RedactedText width="7ch">Antonio</RedactedText> Yang Gramajo
+                      </h1>
+                      <p className="case-summary mt-8 max-w-2xl text-xl leading-relaxed text-black/70">
+                        {profile.headline}. Operacion registrada en{' '}
+                        <RedactedText width="11ch">Huehuetenango</RedactedText>.
+                      </p>
+                    </div>
 
-                  <div className="relative z-10 mt-auto">
-                    <SectionHeading eyebrow="Perfil" title="Datos personales" tone="dark" />
-                    <div className="classified-contact mt-6 grid gap-3">
-                      {contactItems.map((item) => (
-                        <ContactLink item={item} key={item.label} />
-                      ))}
+                    <div className="profile-contact-sheet">
+                      <SectionHeading eyebrow="Perfil" title="Datos personales" />
+                      <div className="classified-contact mt-6 grid gap-2">
+                        {contactItems.map((item) => (
+                          <ContactLink item={item} key={item.label} />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </aside>
-              </section>
+                </section>
+              </div>
             ) : null}
 
             {activeFile === 'formacion' ? (
