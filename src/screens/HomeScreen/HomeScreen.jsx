@@ -98,6 +98,7 @@ const dossierTabs = [
 const CHAMELEON_THEME_DELAY_MS = 2450
 const CHAMELEON_WAVE_DURATION_MS = 2850
 const CHAMELEON_VIEW_TRANSITION_CLASS = 'chameleon-view-transition'
+const PAPER_SHUFFLE_DURATION_MS = 1450
 
 function TimelineItem({ item }) {
   return (
@@ -159,13 +160,121 @@ function ContactLink({ item }) {
   return <div className="contact-item">{content}</div>
 }
 
+function DossierFile({ fileId, isDeclassified }) {
+  if (fileId === 'perfil') {
+    return (
+      <div className="profile-document-stack">
+        <aside className="profile-photo-sheet" aria-label="Fotografia de expediente">
+          <div className="evidence-photo">
+            <img alt="James Antonio Yang Gramajo" src={profileImage} />
+          </div>
+          <div className="profile-photo-tag">Huehuetenango</div>
+        </aside>
+
+        <section className="folder-file is-profile" id="file-perfil">
+          <div className="case-file flex min-h-full flex-col justify-between gap-10">
+            <div>
+              <div className="classified-stamp mb-6 w-fit px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">
+                {isDeclassified ? 'Expediente desclasificado' : 'Archivo clasificado'}
+              </div>
+              <p className="mb-4 text-sm uppercase tracking-[0.28em] text-black/55">
+                Portafolio CV / Expediente profesional
+              </p>
+              <h1 className="case-title text-5xl font-semibold leading-[0.95] text-black sm:text-7xl lg:text-8xl">
+                James <RedactedText width="7ch">Antonio</RedactedText> Yang Gramajo
+              </h1>
+              <p className="case-summary mt-8 max-w-2xl text-xl leading-relaxed text-black/70">
+                {profile.headline}. Operacion registrada en{' '}
+                <RedactedText width="11ch">Huehuetenango</RedactedText>.
+              </p>
+            </div>
+
+            <div className="profile-contact-sheet">
+              <SectionHeading eyebrow="Perfil" title="Datos personales" />
+              <div className="classified-contact mt-6 grid gap-2">
+                {contactItems.map((item) => (
+                  <ContactLink item={item} key={item.label} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  if (fileId === 'formacion') {
+    return (
+      <section className="folder-file" id="file-formacion">
+        <div className="grid gap-10 lg:grid-cols-[30%_70%]">
+          <SectionHeading eyebrow="Formacion" title="Base academica y estudios en curso" />
+          <div className="file-stack grid gap-8">
+            {education.map((item) => (
+              <TimelineItem item={item} key={`${item.level}-${item.period}-${item.title}`} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (fileId === 'experiencia') {
+    return (
+      <section className="folder-file" id="file-experiencia">
+        <div className="grid gap-10 lg:grid-cols-[30%_70%]">
+          <SectionHeading eyebrow="Experiencia" title="Procesos administrativos y desarrollo web" />
+          <div className="file-stack grid gap-10">
+            {experience.map((item) => (
+              <TimelineItem item={item} key={`${item.role}-${item.period}`} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="folder-file folder-file--intel grid gap-8 lg:grid-cols-[60%_40%]" id="file-intel">
+      <div>
+        <SectionHeading eyebrow="Idiomas" title="Comunicacion" tone="dark" />
+        <div className="mt-10 grid gap-8 sm:grid-cols-2">
+          {languages.map((language) => (
+            <article className="intel-card" key={language.name}>
+              <h3 className="text-2xl font-semibold">{language.name}</h3>
+              <ul className="mt-4 grid gap-2 text-lg text-[#F2F2F2]/80">
+                {language.details.map((detail) => (
+                  <li key={detail}>{detail}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="interest-file text-black">
+        <SectionHeading eyebrow="Intereses" title="Pasatiempos" />
+        <ul className="mt-10 grid gap-4 text-3xl font-semibold">
+          {interests.map((interest) => (
+            <li key={interest}>{interest}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
 function HomeScreen() {
   const [showIntro, setShowIntro] = useState(true)
   const [activeFile, setActiveFile] = useState('perfil')
+  const [previousActiveFile, setPreviousActiveFile] = useState('perfil')
+  const [isPaperShuffling, setIsPaperShuffling] = useState(false)
   const [isDeclassified, setIsDeclassified] = useState(true)
   const [chameleonRipple, setChameleonRipple] = useState(null)
   const chameleonRippleTimeoutRef = useRef(null)
   const chameleonThemeTimeoutRef = useRef(null)
+  const paperShuffleTimeoutRef = useRef(null)
+  const activeFileIndex = dossierTabs.findIndex((tab) => tab.id === activeFile)
+  const previousActiveFileIndex = dossierTabs.findIndex((tab) => tab.id === previousActiveFile)
 
   const clearChameleonRippleTimeout = useCallback(() => {
     if (chameleonRippleTimeoutRef.current) {
@@ -181,12 +290,20 @@ function HomeScreen() {
     }
   }, [])
 
+  const clearPaperShuffleTimeout = useCallback(() => {
+    if (paperShuffleTimeoutRef.current) {
+      window.clearTimeout(paperShuffleTimeoutRef.current)
+      paperShuffleTimeoutRef.current = null
+    }
+  }, [])
+
   useEffect(() => {
     return () => {
       clearChameleonRippleTimeout()
       clearChameleonThemeTimeout()
+      clearPaperShuffleTimeout()
     }
-  }, [clearChameleonRippleTimeout, clearChameleonThemeTimeout])
+  }, [clearChameleonRippleTimeout, clearChameleonThemeTimeout, clearPaperShuffleTimeout])
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false)
@@ -204,6 +321,21 @@ function HomeScreen() {
       },
     })
   }, [])
+  const handleFileSelect = useCallback((fileId) => {
+    if (fileId === activeFile) {
+      return
+    }
+
+    clearPaperShuffleTimeout()
+    setPreviousActiveFile(activeFile)
+    setActiveFile(fileId)
+    setIsPaperShuffling(true)
+
+    paperShuffleTimeoutRef.current = window.setTimeout(() => {
+      setIsPaperShuffling(false)
+      paperShuffleTimeoutRef.current = null
+    }, PAPER_SHUFFLE_DURATION_MS)
+  }, [activeFile, clearPaperShuffleTimeout])
   const handleVisualModeToggle = useCallback((event) => {
     const root = document.documentElement
     const nextMode = !isDeclassified
@@ -309,7 +441,7 @@ function HomeScreen() {
                   aria-selected={activeFile === tab.id}
                   className={`folder-tab ${activeFile === tab.id ? 'is-active' : ''}`}
                   key={tab.id}
-                  onClick={() => setActiveFile(tab.id)}
+                  onClick={() => handleFileSelect(tab.id)}
                   type="button"
                 >
                   <span>{tab.marker}</span>
@@ -327,101 +459,31 @@ function HomeScreen() {
             </div>
           </div>
 
-          <div className="folder-panel">
-            {activeFile === 'perfil' ? (
-              <div className="profile-document-stack">
-                <aside className="profile-photo-sheet" aria-label="Fotografia de expediente">
-                  <div className="evidence-photo">
-                    <img alt="James Antonio Yang Gramajo" src={profileImage} />
-                  </div>
-                  <div className="profile-photo-tag">Huehuetenango</div>
-                </aside>
+          <div className={`folder-panel ${isPaperShuffling ? 'is-shuffling' : ''}`}>
+            {dossierTabs.map((tab, index) => {
+              const stackDepth = (index - activeFileIndex + dossierTabs.length) % dossierTabs.length
+              const previousStackDepth =
+                (index - previousActiveFileIndex + dossierTabs.length) % dossierTabs.length
+              const isActive = stackDepth === 0
+              const isIncoming = isPaperShuffling && isActive
 
-                <section className="folder-file is-profile" id="file-perfil">
-                  <div className="case-file flex min-h-full flex-col justify-between gap-10">
-                    <div>
-                      <div className="classified-stamp mb-6 w-fit px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">
-                        {isDeclassified ? 'Expediente desclasificado' : 'Archivo clasificado'}
-                      </div>
-                      <p className="mb-4 text-sm uppercase tracking-[0.28em] text-black/55">
-                        Portafolio CV / Expediente profesional
-                      </p>
-                      <h1 className="case-title text-5xl font-semibold leading-[0.95] text-black sm:text-7xl lg:text-8xl">
-                        James <RedactedText width="7ch">Antonio</RedactedText> Yang Gramajo
-                      </h1>
-                      <p className="case-summary mt-8 max-w-2xl text-xl leading-relaxed text-black/70">
-                        {profile.headline}. Operacion registrada en{' '}
-                        <RedactedText width="11ch">Huehuetenango</RedactedText>.
-                      </p>
-                    </div>
-
-                    <div className="profile-contact-sheet">
-                      <SectionHeading eyebrow="Perfil" title="Datos personales" />
-                      <div className="classified-contact mt-6 grid gap-2">
-                        {contactItems.map((item) => (
-                          <ContactLink item={item} key={item.label} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </div>
-            ) : null}
-
-            {activeFile === 'formacion' ? (
-              <section className="folder-file" id="file-formacion">
-                <div className="grid gap-10 lg:grid-cols-[30%_70%]">
-                  <SectionHeading eyebrow="Formacion" title="Base academica y estudios en curso" />
-                  <div className="file-stack grid gap-8">
-                    {education.map((item) => (
-                      <TimelineItem item={item} key={`${item.level}-${item.period}-${item.title}`} />
-                    ))}
-                  </div>
+              return (
+                <div
+                  aria-hidden={!isActive}
+                  className={[
+                    'document-layer',
+                    `document-layer--${tab.id}`,
+                    isActive ? 'is-active' : `is-depth-${stackDepth}`,
+                    isIncoming ? 'is-incoming' : '',
+                    isIncoming ? `from-depth-${previousStackDepth}` : '',
+                  ].filter(Boolean).join(' ')}
+                  key={tab.id}
+                  style={{ '--stack-depth': String(stackDepth) }}
+                >
+                  <DossierFile fileId={tab.id} isDeclassified={isDeclassified} />
                 </div>
-              </section>
-            ) : null}
-
-            {activeFile === 'experiencia' ? (
-              <section className="folder-file" id="file-experiencia">
-                <div className="grid gap-10 lg:grid-cols-[30%_70%]">
-                  <SectionHeading eyebrow="Experiencia" title="Procesos administrativos y desarrollo web" />
-                  <div className="file-stack grid gap-10">
-                    {experience.map((item) => (
-                      <TimelineItem item={item} key={`${item.role}-${item.period}`} />
-                    ))}
-                  </div>
-                </div>
-              </section>
-            ) : null}
-
-            {activeFile === 'intel' ? (
-              <section className="folder-file folder-file--intel grid gap-8 lg:grid-cols-[60%_40%]" id="file-intel">
-                <div>
-                  <SectionHeading eyebrow="Idiomas" title="Comunicacion" tone="dark" />
-                  <div className="mt-10 grid gap-8 sm:grid-cols-2">
-                    {languages.map((language) => (
-                      <article className="intel-card" key={language.name}>
-                        <h3 className="text-2xl font-semibold">{language.name}</h3>
-                        <ul className="mt-4 grid gap-2 text-lg text-[#F2F2F2]/80">
-                          {language.details.map((detail) => (
-                            <li key={detail}>{detail}</li>
-                          ))}
-                        </ul>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="interest-file text-black">
-                  <SectionHeading eyebrow="Intereses" title="Pasatiempos" />
-                  <ul className="mt-10 grid gap-4 text-3xl font-semibold">
-                    {interests.map((interest) => (
-                      <li key={interest}>{interest}</li>
-                    ))}
-                  </ul>
-                </div>
-              </section>
-            ) : null}
+              )
+            })}
           </div>
         </section>
       </main>
