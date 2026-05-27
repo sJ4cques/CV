@@ -4,6 +4,7 @@
     linear-gradient(90deg, rgb(0 0 0 / 0.03) 1px, transparent 1px),
     #f2f2f2;
   background-size: 28px 28px;
+  min-height: max(100vh, 88rem);
   padding-top: 0;
 }
 
@@ -67,6 +68,7 @@
   z-index: 2;
 }
 
+.flashlight-mode-button,
 .download-pdf-button,
 .chameleon-mode-button {
   align-items: center;
@@ -89,6 +91,25 @@
     transform 180ms ease;
 }
 
+.flashlight-mode-button {
+  aspect-ratio: 1;
+  justify-content: center;
+  padding: 0.85rem;
+}
+
+.flashlight-mode-button[aria-pressed="true"] {
+  background: #f2f2f2;
+  color: #000000;
+}
+
+.flashlight-mode-button:focus-visible,
+.download-pdf-button:focus-visible,
+.chameleon-mode-button:focus-visible {
+  outline: 2px solid #b6b09f;
+  outline-offset: 3px;
+}
+
+.flashlight-mode-button:hover,
 .download-pdf-button:hover,
 .chameleon-mode-button:hover,
 .chameleon-mode-button[aria-pressed="true"] {
@@ -97,6 +118,7 @@
   transform: translateY(-2px);
 }
 
+.flashlight-mode-button svg,
 .download-pdf-button svg,
 .chameleon-mode-button img {
   height: 1.25rem;
@@ -111,6 +133,34 @@
 .chameleon-mode-button[aria-pressed="true"] img,
 .chameleon-mode-button:hover img {
   filter: grayscale(1) brightness(0);
+}
+
+.flashlight-overlay {
+  background:
+    radial-gradient(
+      circle at var(--flashlight-x) var(--flashlight-y),
+      rgb(255 244 205 / 0.08) 0 4.5rem,
+      rgb(255 244 205 / 0.18) 4.5rem 7.8rem,
+      rgb(0 0 0 / 0.46) 10.5rem,
+      rgb(0 0 0 / 0.9) 18rem
+    );
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 90;
+}
+
+.flashlight-overlay::after {
+  background:
+    radial-gradient(
+      circle at var(--flashlight-x) var(--flashlight-y),
+      transparent 0 6.8rem,
+      rgb(0 0 0 / 0.24) 11rem,
+      rgb(0 0 0 / 0.52) 22rem
+    );
+  content: "";
+  inset: 0;
+  position: absolute;
 }
 
 .folder-tab {
@@ -184,7 +234,7 @@
 }
 
 .folder-panel {
-  min-height: max(72rem, calc(100vh - 8.5rem));
+  min-height: max(84rem, calc(100vh - 8.5rem));
   padding: 1.75rem 0.35rem 3rem;
   perspective: 1200px;
   position: relative;

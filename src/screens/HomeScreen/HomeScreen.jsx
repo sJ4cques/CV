@@ -5,13 +5,14 @@ import profileImage from '../../assets/James Yang.jpg'
 import SectionHeading from '../../components/SectionHeading'
 import ChameleonModeButton from './components/ChameleonModeButton'
 import DownloadPdfButton from './components/DownloadPdfButton'
+import FlashlightModeButton from './components/FlashlightModeButton'
 import IntroScreen from './components/IntroScreen'
 import downloadFormalCvPdf from './utils/downloadFormalCvPdf'
 import './HomeScreen.css'
 
 const contactItems = [
   { label: 'Email', value: 'jamesyangudv@gmail.com', href: 'mailto:jamesyangudv@gmail.com' },
-  { label: 'Telefono', value: '4864-7810', href: 'tel:+50248647810' },
+  { label: 'Telefono', value: '4624-7810', href: 'tel:+50246247810' },
   {
     label: 'Direccion',
     value:
@@ -178,14 +179,13 @@ function DossierFile({ fileId, isDeclassified }) {
                 {isDeclassified ? 'Expediente desclasificado' : 'Archivo clasificado'}
               </div>
               <p className="mb-4 text-sm uppercase tracking-[0.28em] text-black/55">
-                Portafolio CV / Expediente profesional
+                Portafolio CV
               </p>
               <h1 className="case-title text-5xl font-semibold leading-[0.95] text-black sm:text-7xl lg:text-8xl">
                 James <RedactedText width="7ch">Antonio</RedactedText> Yang Gramajo
               </h1>
               <p className="case-summary mt-8 max-w-2xl text-xl leading-relaxed text-black/70">
-                {profile.headline}. Operacion registrada en{' '}
-                <RedactedText width="11ch">Huehuetenango</RedactedText>.
+                {profile.headline}.
               </p>
             </div>
 
@@ -269,6 +269,8 @@ function HomeScreen() {
   const [previousActiveFile, setPreviousActiveFile] = useState('perfil')
   const [isPaperShuffling, setIsPaperShuffling] = useState(false)
   const [isDeclassified, setIsDeclassified] = useState(true)
+  const [isFlashlightOn, setIsFlashlightOn] = useState(false)
+  const [flashlightPosition, setFlashlightPosition] = useState({ x: 0, y: 0 })
   const [chameleonRipple, setChameleonRipple] = useState(null)
   const chameleonRippleTimeoutRef = useRef(null)
   const chameleonThemeTimeoutRef = useRef(null)
@@ -305,6 +307,22 @@ function HomeScreen() {
     }
   }, [clearChameleonRippleTimeout, clearChameleonThemeTimeout, clearPaperShuffleTimeout])
 
+  useEffect(() => {
+    if (!isFlashlightOn) {
+      return undefined
+    }
+
+    const updateFlashlightPosition = (event) => {
+      setFlashlightPosition({ x: event.clientX, y: event.clientY })
+    }
+
+    window.addEventListener('pointermove', updateFlashlightPosition)
+
+    return () => {
+      window.removeEventListener('pointermove', updateFlashlightPosition)
+    }
+  }, [isFlashlightOn])
+
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false)
   }, [])
@@ -336,6 +354,15 @@ function HomeScreen() {
       paperShuffleTimeoutRef.current = null
     }, PAPER_SHUFFLE_DURATION_MS)
   }, [activeFile, clearPaperShuffleTimeout])
+  const handleFlashlightToggle = useCallback((event) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect()
+
+    setFlashlightPosition({
+      x: buttonRect.left + buttonRect.width / 2,
+      y: buttonRect.top + buttonRect.height / 2,
+    })
+    setIsFlashlightOn((currentValue) => !currentValue)
+  }, [])
   const handleVisualModeToggle = useCallback((event) => {
     const root = document.documentElement
     const nextMode = !isDeclassified
@@ -426,6 +453,16 @@ function HomeScreen() {
           }}
         />
       ) : null}
+      {isFlashlightOn ? (
+        <div
+          aria-hidden="true"
+          className="flashlight-overlay"
+          style={{
+            '--flashlight-x': `${flashlightPosition.x}px`,
+            '--flashlight-y': `${flashlightPosition.y}px`,
+          }}
+        />
+      ) : null}
 
       <main
         className={`classified-dossier min-h-screen bg-[#F2F2F2] px-4 py-6 text-black sm:px-8 lg:px-12 lg:py-10 ${
@@ -450,6 +487,10 @@ function HomeScreen() {
               ))}
             </nav>
             <div className="folder-actions">
+              <FlashlightModeButton
+                isActive={isFlashlightOn}
+                onActivate={handleFlashlightToggle}
+              />
               <ChameleonModeButton
                 icon={chameleonIcon}
                 isActive={isDeclassified}
