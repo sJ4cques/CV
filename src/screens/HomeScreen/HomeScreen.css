@@ -151,6 +151,23 @@
   z-index: 4;
 }
 
+.classified-dossier:not(.declassified-mode) .folder-tab {
+  border-color: #b6b09f;
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.26);
+}
+
+.classified-dossier:not(.declassified-mode) .folder-tab:nth-child(odd) {
+  transform: rotate(-1.4deg) translateY(2px);
+}
+
+.classified-dossier:not(.declassified-mode) .folder-tab:nth-child(even) {
+  transform: rotate(1.1deg) translateY(3px);
+}
+
+.classified-dossier:not(.declassified-mode) .folder-tab.is-active {
+  transform: rotate(-0.4deg) translateY(0);
+}
+
 .folder-panel {
   background: #f2f2f2;
   border: 2px solid #000000;
@@ -172,6 +189,7 @@
     #101010;
   border-color: #b6b09f;
   box-shadow: 18px 18px 0 rgb(0 0 0 / 0.42);
+  transform: rotate(-0.35deg);
 }
 
 .folder-panel::before {
@@ -183,14 +201,71 @@
   z-index: 4;
 }
 
+.classified-dossier:not(.declassified-mode) .folder-panel::before {
+  background:
+    linear-gradient(105deg, transparent 0 78%, rgb(0 0 0 / 0.18) 78% 100%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 0.045) 0,
+      rgb(0 0 0 / 0.045) 1px,
+      transparent 1px,
+      transparent 10px
+    ),
+    #b6b09f;
+  border: 2px solid rgb(0 0 0 / 0.72);
+  box-shadow: 14px 14px 0 rgb(0 0 0 / 0.24);
+  content: "";
+  inset: -1.8rem 8% auto auto;
+  min-height: 11rem;
+  opacity: 0.82;
+  position: absolute;
+  transform: rotate(4deg);
+  width: min(38rem, 58vw);
+  z-index: 0;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-panel::after {
+  background:
+    linear-gradient(92deg, transparent 0 86%, rgb(0 0 0 / 0.14) 86% 100%),
+    #f2f2f2;
+  border: 1px solid rgb(0 0 0 / 0.54);
+  box-shadow: 10px 10px 0 rgb(0 0 0 / 0.2);
+  content: "";
+  height: min(18rem, 32vh);
+  left: -1.35rem;
+  position: absolute;
+  top: 5.4rem;
+  transform: rotate(-6deg);
+  width: min(26rem, 42vw);
+  z-index: 0;
+}
+
 .folder-file {
   min-height: calc(100vh - 9.25rem);
   padding: clamp(2rem, 4vw, 4rem);
   position: relative;
+  z-index: 1;
 }
 
 .classified-dossier:not(.declassified-mode) .folder-file {
   color: #f2f2f2;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-file::before {
+  border: 3px solid #8b1d12;
+  color: #8b1d12;
+  content: "TOP SECRET";
+  font-size: clamp(1.6rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0.68;
+  padding: 0.15em 0.35em;
+  pointer-events: none;
+  position: absolute;
+  right: clamp(2rem, 9vw, 7rem);
+  top: clamp(5rem, 11vw, 8rem);
+  transform: rotate(-14deg);
+  z-index: 0;
 }
 
 .classified-dossier:not(.declassified-mode) .folder-file::after {
@@ -292,7 +367,8 @@
   background: #b6b09f;
   border-color: #f2f2f2;
   color: #000000;
-  transform: rotate(2deg);
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.26);
+  transform: rotate(-8deg);
 }
 
 .case-title {
@@ -521,6 +597,14 @@
   box-shadow: 8px 8px 0 rgb(0 0 0 / 0.32);
 }
 
+.classified-dossier:not(.declassified-mode) .file-entry:nth-child(odd) {
+  transform: rotate(-0.8deg) translateX(-0.25rem);
+}
+
+.classified-dossier:not(.declassified-mode) .file-entry:nth-child(even) {
+  transform: rotate(0.7deg) translateX(0.35rem);
+}
+
 .file-entry::before {
   background: #000000;
   color: #f2f2f2;
@@ -554,7 +638,8 @@
 
 .classified-dossier:not(.declassified-mode) .classified-chip,
 .classified-dossier:not(.declassified-mode) .intel-card li,
-.classified-dossier:not(.declassified-mode) .interest-file li {
+.classified-dossier:not(.declassified-mode) .interest-file li,
+.classified-dossier:not(.declassified-mode) .file-entry p {
   color: transparent;
   cursor: help;
   position: relative;
@@ -563,7 +648,8 @@
 
 .classified-dossier:not(.declassified-mode) .classified-chip::after,
 .classified-dossier:not(.declassified-mode) .intel-card li::after,
-.classified-dossier:not(.declassified-mode) .interest-file li::after {
+.classified-dossier:not(.declassified-mode) .interest-file li::after,
+.classified-dossier:not(.declassified-mode) .file-entry p::after {
   background:
     repeating-linear-gradient(
       90deg,
@@ -583,13 +669,15 @@
 
 .classified-dossier:not(.declassified-mode) .classified-chip:hover,
 .classified-dossier:not(.declassified-mode) .intel-card li:hover,
-.classified-dossier:not(.declassified-mode) .interest-file li:hover {
+.classified-dossier:not(.declassified-mode) .interest-file li:hover,
+.classified-dossier:not(.declassified-mode) .file-entry p:hover {
   color: #f2f2f2;
 }
 
 .classified-dossier:not(.declassified-mode) .classified-chip:hover::after,
 .classified-dossier:not(.declassified-mode) .intel-card li:hover::after,
-.classified-dossier:not(.declassified-mode) .interest-file li:hover::after {
+.classified-dossier:not(.declassified-mode) .interest-file li:hover::after,
+.classified-dossier:not(.declassified-mode) .file-entry p:hover::after {
   opacity: 0.12;
   transform: translateY(-0.08em);
 }
