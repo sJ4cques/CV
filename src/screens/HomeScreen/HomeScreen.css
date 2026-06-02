@@ -1061,7 +1061,7 @@
 
 .folder-file--projects {
   min-height: 72rem;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .projects-file {
