@@ -289,6 +289,13 @@
   z-index: 4;
 }
 
+.document-layer.is-depth-4 {
+  filter: saturate(0.58);
+  opacity: 0.5;
+  transform: translateX(-54%) translateY(10.2rem) rotate(-7deg) scale(0.9);
+  z-index: 3;
+}
+
 .document-layer.from-depth-1 {
   --from-rotate: 3deg;
   --from-scale: 0.985;
@@ -308,6 +315,13 @@
   --from-scale: 0.93;
   --from-x: -42%;
   --from-y: 7.4rem;
+}
+
+.document-layer.from-depth-4 {
+  --from-rotate: -7deg;
+  --from-scale: 0.9;
+  --from-x: -54%;
+  --from-y: 10.2rem;
 }
 
 .document-layer:not(.is-active) .folder-file,
@@ -372,6 +386,10 @@
 
 #file-experiencia {
   --sheet-rotation: -0.75deg;
+}
+
+#file-proyectos {
+  --sheet-rotation: -0.2deg;
 }
 
 #file-intel {
@@ -1039,6 +1057,262 @@
 .interest-file li {
   border-bottom: 1px solid rgb(0 0 0 / 0.35);
   padding-bottom: 0.6rem;
+}
+
+.folder-file--projects {
+  min-height: 72rem;
+  overflow: visible;
+}
+
+.projects-file {
+  display: grid;
+  gap: 2rem;
+}
+
+.projects-file__header {
+  border-bottom: 2px solid #000000;
+  display: grid;
+  gap: 1.25rem;
+  padding-bottom: 1.5rem;
+}
+
+.projects-file__header p {
+  color: rgb(0 0 0 / 0.68);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 36rem;
+}
+
+.project-editor {
+  background:
+    linear-gradient(90deg, #b6b09f 0 0.45rem, transparent 0.45rem),
+    rgb(242 242 242 / 0.94);
+  border: 2px solid #000000;
+  box-shadow: 8px 8px 0 rgb(0 0 0 / 0.12);
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 1.5rem 2rem;
+}
+
+.project-editor .classified-heading h2 {
+  font-size: 1.45rem;
+}
+
+.project-editor label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.project-editor label span {
+  color: rgb(0 0 0 / 0.65);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.project-editor input,
+.project-editor textarea {
+  background: #f2f2f2;
+  border: 2px solid #000000;
+  color: #000000;
+  font: inherit;
+  line-height: 1.5;
+  padding: 0.85rem 0.95rem;
+  width: 100%;
+}
+
+.project-editor textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.project-editor input:focus,
+.project-editor textarea:focus {
+  outline: 2px solid #b6b09f;
+  outline-offset: 2px;
+}
+
+.project-editor button,
+.project-card a,
+.project-card button,
+.project-pagination button {
+  align-items: center;
+  background: #000000;
+  border: 2px solid #000000;
+  color: #f2f2f2;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  justify-content: center;
+  letter-spacing: 0.14em;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+  width: fit-content;
+}
+
+.project-editor__actions,
+.project-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.project-editor button:hover,
+.project-card a:hover,
+.project-card button:hover,
+.project-pagination button:hover {
+  background: #b6b09f;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.project-editor button:disabled,
+.project-pagination button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+
+.project-pagination button:disabled {
+  cursor: not-allowed;
+}
+
+.project-status {
+  min-height: 1.4rem;
+}
+
+.project-status p,
+.project-empty {
+  color: rgb(0 0 0 / 0.64);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-status__error {
+  color: #8b1d12 !important;
+}
+
+.project-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.project-card {
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.11) 0 0.45rem, transparent 0.45rem),
+    #f2f2f2;
+  border: 1px solid rgb(0 0 0 / 0.3);
+  box-shadow: 7px 7px 0 rgb(0 0 0 / 0.08);
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.35rem 1.35rem 1.35rem 1.85rem;
+}
+
+.project-card__meta {
+  align-items: center;
+  color: rgb(0 0 0 / 0.58);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  font-weight: 700;
+  gap: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.project-card h3 {
+  color: #000000;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.08;
+}
+
+.project-card p {
+  color: rgb(0 0 0 / 0.72);
+  line-height: 1.7;
+}
+
+.project-pagination {
+  align-items: center;
+  border-top: 2px solid #000000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding-top: 1rem;
+}
+
+.project-pagination span {
+  color: rgb(0 0 0 / 0.64);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.classified-dossier:not(.declassified-mode) .folder-file--projects {
+  color: #f2f2f2;
+}
+
+.classified-dossier:not(.declassified-mode) .projects-file__header {
+  border-color: #b6b09f;
+}
+
+.classified-dossier:not(.declassified-mode) .projects-file__header p,
+.classified-dossier:not(.declassified-mode) .project-status p,
+.classified-dossier:not(.declassified-mode) .project-empty {
+  color: rgb(242 242 242 / 0.7);
+}
+
+.classified-dossier:not(.declassified-mode) .project-editor,
+.classified-dossier:not(.declassified-mode) .project-card {
+  background:
+    linear-gradient(90deg, #b6b09f 0 0.45rem, transparent 0.45rem),
+    rgb(0 0 0 / 0.48);
+  border-color: rgb(182 176 159 / 0.54);
+  box-shadow: 8px 8px 0 rgb(0 0 0 / 0.34);
+}
+
+.classified-dossier:not(.declassified-mode) .project-editor label span,
+.classified-dossier:not(.declassified-mode) .project-card__meta {
+  color: rgb(182 176 159 / 0.88);
+}
+
+.classified-dossier:not(.declassified-mode) .project-editor input,
+.classified-dossier:not(.declassified-mode) .project-editor textarea {
+  background: #0d0d0d;
+  border-color: #b6b09f;
+  color: #f2f2f2;
+}
+
+.classified-dossier:not(.declassified-mode) .project-card h3 {
+  color: #f2f2f2;
+}
+
+.classified-dossier:not(.declassified-mode) .project-card p {
+  color: rgb(242 242 242 / 0.74);
+}
+
+.classified-dossier:not(.declassified-mode) .project-pagination {
+  border-color: #b6b09f;
+}
+
+.classified-dossier:not(.declassified-mode) .project-pagination span {
+  color: rgb(182 176 159 / 0.88);
+}
+
+.declassified-mode .project-editor,
+.declassified-mode .project-card {
+  border-color: #000000;
 }
 
 .intro-copy {

@@ -7,6 +7,7 @@ import ChameleonModeButton from './components/ChameleonModeButton'
 import DownloadPdfButton from './components/DownloadPdfButton'
 import FlashlightModeButton from './components/FlashlightModeButton'
 import IntroScreen from './components/IntroScreen'
+import ProjectsDossierFile from './components/ProjectsDossierFile'
 import downloadFormalCvPdf from './utils/downloadFormalCvPdf'
 import './HomeScreen.css'
 
@@ -93,13 +94,15 @@ const dossierTabs = [
   { id: 'perfil', label: 'Perfil', marker: '01' },
   { id: 'formacion', label: 'Formacion', marker: '02' },
   { id: 'experiencia', label: 'Experiencia', marker: '03' },
-  { id: 'intel', label: 'Intel', marker: '04' },
+  { id: 'proyectos', label: 'Proyectos', marker: '04' },
+  { id: 'intel', label: 'Intel', marker: '05' },
 ]
 
 const CHAMELEON_THEME_DELAY_MS = 2450
 const CHAMELEON_WAVE_DURATION_MS = 2850
 const CHAMELEON_VIEW_TRANSITION_CLASS = 'chameleon-view-transition'
 const PAPER_SHUFFLE_DURATION_MS = 1450
+const PROJECTS_EDITOR_SECRET = 'secrets'
 
 function TimelineItem({ item }) {
   return (
@@ -161,7 +164,7 @@ function ContactLink({ item }) {
   return <div className="contact-item">{content}</div>
 }
 
-function DossierFile({ fileId, isDeclassified }) {
+function DossierFile({ fileId, isDeclassified, isProjectsEditorUnlocked }) {
   if (fileId === 'perfil') {
     return (
       <div className="profile-document-stack">
@@ -233,6 +236,10 @@ function DossierFile({ fileId, isDeclassified }) {
     )
   }
 
+  if (fileId === 'proyectos') {
+    return <ProjectsDossierFile isEditorUnlocked={isProjectsEditorUnlocked} />
+  }
+
   return (
     <section className="folder-file folder-file--intel grid gap-8 lg:grid-cols-[60%_40%]" id="file-intel">
       <div>
@@ -270,11 +277,13 @@ function HomeScreen() {
   const [isPaperShuffling, setIsPaperShuffling] = useState(false)
   const [isDeclassified, setIsDeclassified] = useState(true)
   const [isFlashlightOn, setIsFlashlightOn] = useState(false)
+  const [isProjectsEditorUnlocked, setIsProjectsEditorUnlocked] = useState(false)
   const [flashlightPosition, setFlashlightPosition] = useState({ x: 0, y: 0 })
   const [chameleonRipple, setChameleonRipple] = useState(null)
   const chameleonRippleTimeoutRef = useRef(null)
   const chameleonThemeTimeoutRef = useRef(null)
   const paperShuffleTimeoutRef = useRef(null)
+  const projectsSecretBufferRef = useRef('')
   const activeFileIndex = dossierTabs.findIndex((tab) => tab.id === activeFile)
   const previousActiveFileIndex = dossierTabs.findIndex((tab) => tab.id === previousActiveFile)
 
@@ -322,6 +331,47 @@ function HomeScreen() {
       window.removeEventListener('pointermove', updateFlashlightPosition)
     }
   }, [isFlashlightOn])
+
+  useEffect(() => {
+    if (activeFile !== 'proyectos') {
+      projectsSecretBufferRef.current = ''
+      return undefined
+    }
+
+    if (isProjectsEditorUnlocked) {
+      return undefined
+    }
+
+    const handleSecretKeyDown = (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey) {
+        return
+      }
+
+      const key = event.key.toLowerCase()
+
+      if (!/^[a-z]$/.test(key)) {
+        return
+      }
+
+      const nextBuffer = `${projectsSecretBufferRef.current}${key}`
+      projectsSecretBufferRef.current = PROJECTS_EDITOR_SECRET.startsWith(nextBuffer)
+        ? nextBuffer
+        : PROJECTS_EDITOR_SECRET.startsWith(key)
+          ? key
+          : ''
+
+      if (projectsSecretBufferRef.current === PROJECTS_EDITOR_SECRET) {
+        setIsProjectsEditorUnlocked(true)
+        projectsSecretBufferRef.current = ''
+      }
+    }
+
+    window.addEventListener('keydown', handleSecretKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleSecretKeyDown)
+    }
+  }, [activeFile, isProjectsEditorUnlocked])
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false)
@@ -521,7 +571,11 @@ function HomeScreen() {
                   key={tab.id}
                   style={{ '--stack-depth': String(stackDepth) }}
                 >
-                  <DossierFile fileId={tab.id} isDeclassified={isDeclassified} />
+                  <DossierFile
+                    fileId={tab.id}
+                    isDeclassified={isDeclassified}
+                    isProjectsEditorUnlocked={isProjectsEditorUnlocked}
+                  />
                 </div>
               )
             })}
