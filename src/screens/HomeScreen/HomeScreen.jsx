@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import chameleonIcon from '../../assets/chameleon-svgrepo-com.svg'
 import profileImage from '../../assets/James Yang.jpg'
 import SectionHeading from '../../components/SectionHeading'
+import { fetchProjects } from '../../lib/projectsRepository'
 import ChameleonModeButton from './components/ChameleonModeButton'
 import DownloadPdfButton from './components/DownloadPdfButton'
 import FlashlightModeButton from './components/FlashlightModeButton'
@@ -376,18 +377,31 @@ function HomeScreen() {
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false)
   }, [])
-  const handlePdfDownload = useCallback(() => {
-    void downloadFormalCvPdf({
-      contactItems,
-      education,
-      experience,
-      interests,
-      languages,
-      profile: {
-        ...profile,
-        photo: profileImage,
-      },
-    })
+  const handlePdfDownload = useCallback(async () => {
+    let projects = []
+
+    try {
+      projects = await fetchProjects()
+    } catch (error) {
+      console.error(error)
+    }
+
+    try {
+      await downloadFormalCvPdf({
+        contactItems,
+        education,
+        experience,
+        interests,
+        languages,
+        profile: {
+          ...profile,
+          photo: profileImage,
+        },
+        projects,
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }, [])
   const handleFileSelect = useCallback((fileId) => {
     if (fileId === activeFile) {

@@ -1,9 +1,17 @@
+import { jsPDF } from 'jspdf'
+
 const COLORS = {
   accent: [182, 176, 159],
   black: [0, 0, 0],
   muted: [78, 78, 78],
   paper: [242, 242, 242],
 }
+
+const projectDateFormatter = new Intl.DateTimeFormat('es-GT', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+})
 
 function setText(doc, color, size, style = 'normal') {
   doc.setFont('helvetica', style)
@@ -34,6 +42,16 @@ function getImageDataUrl(imageUrl) {
     )
 }
 
+function formatProjectDate(value) {
+  if (!value) {
+    return 'Sin fecha'
+  }
+
+  const date = new Date(value)
+
+  return Number.isNaN(date.getTime()) ? 'Sin fecha' : projectDateFormatter.format(date)
+}
+
 async function downloadFormalCvPdf({
   contactItems,
   education,
@@ -41,8 +59,8 @@ async function downloadFormalCvPdf({
   interests,
   languages,
   profile,
+  projects = [],
 }) {
-  const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({ format: 'letter', unit: 'mm' })
   const pageWidth = doc.internal.pageSize.getWidth()
   const pageHeight = doc.internal.pageSize.getHeight()
@@ -51,6 +69,7 @@ async function downloadFormalCvPdf({
   const dateColumnWidth = 38
   const dateGap = 8
   const bodyColumnWidth = contentWidth - dateColumnWidth - dateGap
+  const projectItems = Array.isArray(projects) ? projects : []
   let y = margin + 8
 
   const ensureSpace = (height) => {
@@ -169,6 +188,146 @@ async function downloadFormalCvPdf({
     y += rowHeight
   }
 
+  const getProjectLinks = (project) => (
+    [
+      project.project_url ? { label: 'Ver proyecto', url: project.project_url } : null,
+      project.file_url ? { label: 'Descargar archivo', url: project.file_url } : null,
+    ].filter(Boolean)
+  )
+
+  const getProjectCardHeight = (project, width) => {
+    const cardPadding = 4.5
+    const textWidth = width - cardPadding * 2
+    const titleLines = doc.splitTextToSize(project.name || 'Proyecto sin nombre', textWidth)
+    const descriptionLines = doc.splitTextToSize(project.description || 'Sin descripcion.', textWidth)
+    const links = getProjectLinks(project)
+
+    return Math.max(
+      36,
+      cardPadding * 2
+        + 4.2
+        + titleLines.length * 4.9
+        + 1.5
+        + descriptionLines.length * 4.15
+        + (links.length ? 3 + links.length * 4.4 : 0),
+    )
+  }
+
+  const drawProjectCard = (project, x, cardY, width, height) => {
+    const cardPadding = 4.5
+    const textWidth = width - cardPadding * 2
+    const titleLines = doc.splitTextToSize(project.name || 'Proyecto sin nombre', textWidth)
+    const descriptionLines = doc.splitTextToSize(project.description || 'Sin descripcion.', textWidth)
+    const links = getProjectLinks(project)
+    let textY = cardY + cardPadding + 3.2
+
+    doc.setDrawColor(...COLORS.accent)
+    doc.setFillColor(250, 250, 250)
+    doc.rect(x, cardY, width, height, 'FD')
+    doc.setFillColor(...COLORS.accent)
+    doc.rect(x, cardY, 2, height, 'F')
+
+    setText(doc, COLORS.muted, 7, 'bold')
+    doc.text(formatProjectDate(project.created_at).toUpperCase(), x + cardPadding, textY)
+    textY += 5
+
+    setText(doc, COLORS.black, 9.5, 'bold')
+    doc.text(titleLines, x + cardPadding, textY)
+    textY += titleLines.length * 4.9 + 1.5
+
+    setText(doc, COLORS.black, 8.2)
+    doc.text(descriptionLines, x + cardPadding, textY)
+    textY += descriptionLines.length * 4.15 + 2
+
+    links.forEach((link) => {
+      setText(doc, COLORS.black, 7.6, 'bold')
+      if (typeof doc.textWithLink === 'function') {
+        doc.textWithLink(link.label, x + cardPadding, textY, { url: link.url })
+      } else {
+        doc.text(link.label, x + cardPadding, textY)
+      }
+      textY += 4.4
+    })
+  }
+
+  const addProjectTextEntry = (project) => {
+    const links = getProjectLinks(project)
+
+    ensureSpace(15)
+    setText(doc, COLORS.muted, 8, 'bold')
+    doc.text(formatProjectDate(project.created_at).toUpperCase(), margin, y)
+    y += 4.5
+
+    addWrappedText(project.name || 'Proyecto sin nombre', margin, contentWidth, {
+      after: 0,
+      color: COLORS.black,
+      lineHeight: 4.7,
+      size: 10,
+      style: 'bold',
+    })
+    addWrappedText(project.description || 'Sin descripcion.', margin, contentWidth, {
+      after: 1,
+      color: COLORS.black,
+      lineHeight: 4.6,
+      size: 8.8,
+    })
+
+    links.forEach((link) => {
+      ensureSpace(5)
+      setText(doc, COLORS.black, 8, 'bold')
+      if (typeof doc.textWithLink === 'function') {
+        doc.textWithLink(link.label, margin, y, { url: link.url })
+      } else {
+        doc.text(link.label, margin, y)
+      }
+      y += 4.8
+    })
+
+    y += 2
+  }
+
+  const addProjectCards = () => {
+    const columnGap = 5
+    const rowGap = 5
+    const columnWidth = (contentWidth - columnGap) / 2
+    const maxCardHeight = pageHeight - margin * 2 - 8
+    let index = 0
+
+    while (index < projectItems.length) {
+      const currentProject = projectItems[index]
+      const nextProject = projectItems[index + 1]
+      const currentHeight = getProjectCardHeight(currentProject, columnWidth)
+      const nextHeight = nextProject ? getProjectCardHeight(nextProject, columnWidth) : 0
+      const rowHeight = Math.max(currentHeight, nextHeight)
+
+      if (rowHeight > maxCardHeight) {
+        const fullWidthHeight = getProjectCardHeight(currentProject, contentWidth)
+
+        if (fullWidthHeight > maxCardHeight) {
+          addProjectTextEntry(currentProject)
+          index += 1
+          continue
+        }
+
+        ensureSpace(fullWidthHeight + rowGap)
+        drawProjectCard(currentProject, margin, y, contentWidth, fullWidthHeight)
+        y += fullWidthHeight + rowGap
+        index += 1
+        continue
+      }
+
+      ensureSpace(rowHeight + rowGap)
+      drawProjectCard(currentProject, margin, y, columnWidth, rowHeight)
+
+      if (nextProject) {
+        drawProjectCard(nextProject, margin + columnWidth + columnGap, y, columnWidth, rowHeight)
+      }
+
+      y += rowHeight + rowGap
+      index += 2
+    }
+  }
+
   doc.setProperties({
     author: profile.name,
     subject: 'Curriculum vitae formal',
@@ -269,6 +428,17 @@ async function downloadFormalCvPdf({
 
   addSectionTitle('Intereses')
   addWrappedText(interests.join(', '), margin, contentWidth, { color: COLORS.black, size: 9 })
+
+  addSectionTitle('Proyectos')
+  if (projectItems.length) {
+    addProjectCards()
+  } else {
+    addWrappedText('Portafolio de proyectos disponible en el sitio web.', margin, contentWidth, {
+      color: COLORS.black,
+      size: 9,
+      style: 'bold',
+    })
+  }
 
   doc.save('CV-James-Yang.pdf')
 }
